@@ -1,0 +1,28 @@
+{
+  "name": "birthdayreminder",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/osborn94/birthdayReminder.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/osborn94/birthdayReminder/issues"
+  },
+  "homepage": "https://github.com/osborn94/birthdayReminder#readme",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "express": "^5.2.1",
+    "mongoose": "^9.0.2",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^7.0.11"
+  }
+}

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birthday Reminder System</title>
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎂 Birthday Reminder System</h1>
+      <p>Never miss a customer's special day!</p>
+    </div>
+
+    <!-- Success/Error Notifications -->
+    <% if (typeof success !== 'undefined' && success) { %>
+      <div class="notification success">
+        <% if (success === 'added') { %>
+          ✅ Customer added successfully!
+        <% } else if (success === 'deleted') { %>
+          ✅ Customer deleted successfully!
+        <% } else if (success === 'emails_sent') { %>
+          ✅ Birthday emails sent! (<%= typeof count !== 'undefined' ? count : 0 %> email(s))
+        <% } %>
+      </div>
+    <% } %>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="notification error">
+        <% if (error === 'add_failed') { %>
+          ❌ Failed to add customer. Please try again.
+        <% } else if (error === 'delete_failed') { %>
+          ❌ Failed to delete customer. Please try again.
+        <% } else { %>
+          ❌ An error occurred. Please try again.
+        <% } %>
+      </div>
+    <% } %>
+
+    <!-- Today's Birthdays Section -->
+    <% if (todayBirthdays && todayBirthdays.length > 0) { %>
+      <div class="today-birthdays">
+        <h2>🎉 Today's Birthdays (<%= todayBirthdays.length %>)</h2>
+        <% todayBirthdays.forEach(customer => { %>
+          <div class="birthday-card">
+            <h3><%= customer.username %> 🎂</h3>
+            <p><%= customer.email %></p>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+
+    <div class="grid">
+      <!-- Add Customer Form -->
+      <div class="card">
+        <h2>📝 Add New Customer</h2>
+        <form action="/customers/add" method="POST">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input 
+              type="text" 
+              id="username" 
+              name="username" 
+              placeholder="John Doe" 
+              required
+              maxlength="100"
+            >
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder="john@example.com" 
+              required
+              maxlength="100"
+            >
+          </div>
+          <div class="form-group">
+            <label for="dateOfBirth">Date of Birth</label>
+            <input 
+              type="date" 
+              id="dateOfBirth" 
+              name="dateOfBirth" 
+              required
+              max="<%= new Date().toISOString().split('T')[0] %>"
+            >
+          </div>
+          <button type="submit" class="btn">Add Customer</button>
+        </form>
+
+        <!-- Test Email Buttons -->
+        <form action="/test-emails" method="POST">
+          <button type="submit" class="btn btn-test">Test Birthday Emails (Today's Birthdays)</button>
+        </form>
+        <form action="/test-email-all" method="POST" style="margin-top: 10px;">
+          <button type="submit" class="btn btn-test" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            Send Test Email to All Customers
+          </button>
+        </form>
+      </div>
+
+      <!-- Customer List -->
+      <div class="card">
+        <h2>👥 Customer List (<%= customers ? customers.length : 0 %>)</h2>
+        <div class="customer-list">
+          <% if (!customers || customers.length === 0) { %>
+            <div class="empty-state">
+              <div style="font-size: 4em;">🎁</div>
+              <p>No customers added yet</p>
+            </div>
+          <% } else { %>
+            <% 
+              const today = new Date();
+              customers.forEach(customer => { 
+                const dob = new Date(customer.dateOfBirth);
+                const isBirthday = dob.getMonth() === today.getMonth() && 
+                                   dob.getDate() === today.getDate();
+                const formattedDate = dob.toLocaleDateString('en-US', { 
+                  month: 'long', 
+                  day: 'numeric', 
+                  year: 'numeric' 
+                });
+            %>
+              <div class="customer-item <%= isBirthday ? 'birthday-today' : '' %>">
+                <div class="customer-info">
+                  <h3><%= customer.username %> <%= isBirthday ? '🎂' : '' %></h3>
+                  <p>📧 <%= customer.email %></p>
+                  <p>📅 <%= formattedDate %></p>
+                </div>
+                <form action="/customers/delete/<%= customer._id %>" method="POST" style="display: inline;">
+                  <button 
+                    type="submit" 
+                    class="btn btn-danger"
+                    onclick="return confirm('Are you sure you want to delete <%= customer.username %>?')"
+                  >
+                    Delete
+                  </button>
+                </form>
+              </div>
+            <% }); %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Information Box -->
+    <div class="info-box">
+      <h3>🤖 Automated Email System</h3>
+      <p>
+        ✅ The system automatically checks for birthdays every day at <strong>7:00 AM</strong> 
+        and sends personalized birthday wishes to customers.
+      </p>
+      <p>
+        ✅ Use the "Test Birthday Emails" button to manually send emails to today's birthday celebrants.
+      </p>
+      <p>
+        ✅ Use the "Send Test Email to All Customers" button to verify email functionality for all customers.
+      </p>
+      
+    </div>
+  </div>
+
+  <script>
+    // Auto-hide notifications after 5 seconds
+    setTimeout(() => {
+      const notifications = document.querySelectorAll('.notification');
+      notifications.forEach(notification => {
+        notification.style.transition = 'opacity 0.5s';
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 500);
+      });
+    }, 5000);
+  </script>
+</body>
+</html>
