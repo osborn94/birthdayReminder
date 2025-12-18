@@ -33,8 +33,8 @@ const Customer = mongoose.model('Customer', customerSchema);
 // Email Setup
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD
@@ -79,7 +79,7 @@ const getBirthdayEmail = (username) => `
     <p>May this year bring you happiness, success, and all the amazing things you've been dreaming of.</p>
     <p>Thank you for being such a valued customer. Here's to another incredible year ahead!</p>
     <div class="emoji">🎁✨🥳</div>
-    <div class="footer"><p><strong>With warm wishes,</strong><br>Your Business Team</p></div>
+    <div class="footer"><p><strong>With warm wishes,</strong><br>Osborn Networks</p></div>
   </div>
 </body>
 </html>`;
