@@ -1,0 +1,16 @@
+name: Birthday Reminder Cron
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # 7am Nigeria (UTC+1)
+  workflow_dispatch:
+
+jobs:
+  birthday:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call birthday cron endpoint
+        run: |
+          curl -X GET https://birthdayreminder-8wsw.onrender.com/cron/birthday \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}"

@@ -4,6 +4,7 @@ const path = require('path');
 const { sendBirthdayEmails, sendTestEmailToAll } = require("./services/birthdayService");
 const connectDB = require('./config/db');
 const Customer = require("./models/customer");
+const runBirthdayJob = require("./jobs/birthdayJob");
 
 const app = express();
 
@@ -40,6 +41,24 @@ app.get('/', async (req, res) => {
     res.render('index', { customers: [], todayBirthdays: [], success: null, error: 'load_failed' });
   }
 });
+
+
+app.get("/cron/birthday", async (req, res) => {
+  const secret = req.headers["x-cron-secret"];
+
+  if (secret !== process.env.CRON_SECRET) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  try {
+    await runBirthdayJob();
+    res.json({ status: "Birthday emails sent" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Cron failed" });
+  }
+});
+
 
 app.post('/customers/add', async (req, res) => {
   try {
