@@ -44,6 +44,7 @@ app.get('/', async (req, res) => {
 
 
 app.get("/cron/birthday", async (req, res) => {
+   console.log("🚀 Cron endpoint HIT");
   const secret = req.headers["x-cron-secret"];
 
   if (secret !== process.env.CRON_SECRET) {

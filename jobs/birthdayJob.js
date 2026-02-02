@@ -3,6 +3,7 @@ const connectDB = require("../config/db");
 const { sendBirthdayEmails } = require("../services/birthdayService");
 
 module.exports = async function runBirthdayJob() {
+  console.log("Birthday cron job STARTED at", new Date().toISOString());
   try {
     console.log("🎉 Birthday cron job started");
     await connectDB();
