@@ -2,7 +2,7 @@ name: Birthday Reminder Cron
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # every 5 minutes for testing purposes
+    - cron: "0 6 * * *"   # 7am Nigeria time (UTC+1)
   workflow_dispatch:
 
 jobs:

@@ -17,7 +17,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Cron job - runs daily at 7:00 AM
 // cron.schedule('0 7 * * *', () => {
-//   console.log('🕐 Running scheduled birthday check at 7:00 AM...');
+//   console.log('Running scheduled birthday check at 7:00 AM...');
 //   sendBirthdayEmails();
 // });
 
@@ -44,7 +44,7 @@ app.get('/', async (req, res) => {
 
 
 app.get("/cron/birthday", async (req, res) => {
-   console.log("🚀 Cron endpoint HIT");
+   console.log("Cron endpoint HIT");
   const secret = req.headers["x-cron-secret"];
 
   if (secret !== process.env.CRON_SECRET) {
