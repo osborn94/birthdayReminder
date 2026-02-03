@@ -27,8 +27,8 @@ app.get('/', async (req, res) => {
     const customers = await Customer.find().sort({ dateOfBirth: 1 });
     const today = new Date();
     const todayBirthdays = customers.filter(c => {
-      const dob = new Date(c.dateOfBirth);
-      return dob.getMonth() === today.getMonth() && dob.getDate() === today.getDate();
+    const dob = new Date(c.dateOfBirth);
+    return dob.getMonth() === today.getMonth() && dob.getDate() === today.getDate();
     });
     res.render('index', { 
       customers, 
@@ -44,21 +44,48 @@ app.get('/', async (req, res) => {
 
 
 app.get("/cron/birthday", async (req, res) => {
-   console.log("Cron endpoint HIT");
+  console.log("Cron endpoint HIT");
+
   const secret = req.headers["x-cron-secret"];
 
-  if (secret !== process.env.CRON_SECRET) {
+  // Security check
+  if (!secret || secret !== process.env.CRON_SECRET) {
+    console.warn("❌ Unauthorized cron attempt");
     return res.status(401).json({ error: "Unauthorized" });
   }
 
   try {
-    await runBirthdayJob();
-    res.json({ status: "Birthday emails sent" });
+    console.log("Birthday cron job STARTED at", new Date().toISOString());
+
+    // Expect runBirthdayJob to return a summary object
+    const result = await runBirthdayJob();
+
+
+    if (result.smtpError) {
+      console.warn("Cron completed but SMTP had issues");
+
+      return res.status(200).json({
+        status: "Completed with email delivery issues",
+        ...result,
+      });
+    }
+
+    return res.status(200).json({
+      status: "Birthday emails processed successfully",
+      ...result,
+    });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Cron failed" });
+    console.error("Cron execution failed:", err.message);
+
+    //  Server stays alive but cron is marked failed
+    return res.status(500).json({
+      error: "Cron execution failed",
+      message: err.message,
+    });
   }
 });
+
 
 
 app.post('/customers/add', async (req, res) => {
